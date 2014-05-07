@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Мої VK-фото-посилання</title>
+<style>html, body { padding: 0; margin: 0; height: 100%; overflow: scroll;
+                    font: normal normal 11px/1.182 tahoma,arial,verdana,Lucida Sans,sans-serif; }</style>
+<script src="//vk.com/js/api/xd_connection.js?2"></script>
+</head>
+<body>
+Хочете зберегти на комп’ютер всі фото з VK? Тоді Ви прийшли за правильною адресою! :)
+<br>Цей додаток виведе посилання на всі фото з усіх Ваших фотоальбомів,
+і Ви зможете завантажити їх всіх в один клік за допомогою розширення <i>DownThemAll</i> для браузера <i>Firefox</i>.
+При зберіганні вказуйте фільтр перейменування <b>*text*\*name*.*ext*</b>,
+щоб фото збереглись в окремих папках відповідно до назви фотоальбому.
+<!--<br>Також Ви зможете видалити всі свої фото в один клік.-->
+<br>
+<br><button type="button" onclick="return check_rights_and_run(get_photo_links)">Отримати посилання на фото</button>
+    <!--<button type="button" onclick="return check_rights_and_run(remove_all_photos)">Видалити всі фото</button>-->
+<br>
+<hr>
+<div id="output"></div>
+
+<script>
+    // constants
+    var $delay = 500; // Delay between requests
+    var $rights = 4; // Rights needed bitmask
+    // global vars
+    var $user_id = 0;
+    var $intention = null;
+    var $output;
+
+    function puts(str) {
+        var element = document.createElement('div');
+        element.innerHTML = str;
+        $output.appendChild(element);
+    }
+    function clear_puts() {
+        $output.innerHTML = '';
+    }
+    function puts_error(err_obj) {
+        puts('ERROR: ' + err_obj.error_msg);
+    }
+    function puts_photos(photos, title) {
+        var safe_title = title.replace(/[<>:"/\\|?*]/g, '_'); // replace file system reserved characters
+        safe_title = safe_title.replace(/\.*$/g, ''); // I have some problems with two or more dots at the end of folder name
+        puts('<h3>' + title + '</h3>' + photos.map(function(photo) {
+            var href = photo.src_xxxbig || photo.src_xxbig || photo.src_xbig || photo.src_big || photo.src_small || photo.src;
+            return '<a href="' + href + '">' + safe_title + '</a>';
+        }).join(' '));
+    }
+
+    function get_photo_links() {
+        clear_puts();
+        process_user_photos();
+    }
+    function process_user_photos() {
+        VK.api('photos.getUserPhotos', {user_id: $user_id, count: 1000}, function(data) {
+            if (data.error) return puts_error(data.error);
+            puts_photos(data.response, 'Photos of me');
+
+            setTimeout(process_albums, $delay);
+        });
+    }
+    function get_albums_and_run(func) {
+        VK.api('photos.getAlbums', {owner_id: $user_id}, function(data) {
+            if (data.error) return puts_error(data.error);
+            var albums = data.response;
+            albums.push({aid: 'profile', title: 'profile'});
+            albums.push({aid: 'wall', title: 'wall'});
+            albums.push({aid: 'saved', title: 'saved'});
+            setTimeout(function(){ func(albums) }, $delay);
+        });
+    }
+    function process_albums() {
+        get_albums_and_run(function(albums) {
+            setTimeout(function(){ process_album(0, albums) }, $delay);
+        });
+    }
+    function process_album(album_no, albums) {
+        var album = albums[album_no];
+        VK.api('photos.get', {owner_id: $user_id, album_id: album.aid, count: 1000}, function(data) {
+            if (data.error) return puts_error(data.error);
+            puts_photos(data.response, album.title);
+        });
+        if (album_no < albums.length - 1) {
+            setTimeout(function(){ process_album(album_no + 1, albums) }, $delay);
+        }
+    }
+
+    function remove_all_photos() {
+        clear_puts();
+        if (confirm("Точно видалити?")) {
+            get_albums_and_run(function(albums) {
+                setTimeout(function(){ remove_album(0, albums) }, $delay);
+            });
+        }
+    }
+    function remove_album(album_no, albums) {
+        var album = albums[album_no];
+        VK.api('photos.deleteAlbum', {group_id: $user_id, album_id: album.aid}, function(data) {
+            if (data.error) return puts_error(data.error);
+            puts('Видадено: ' + album.title);
+        });
+        if (album_no < albums.length - 1) {
+            setTimeout(function(){ remove_album(album_no + 1, albums) }, $delay);
+        }
+    }
+
+    function check_rights_and_run(func) {
+        $user_id = $user_id || window.location.search.match(/user_id=(\d+)/)[1];
+        $output = $output || document.getElementById('output');
+
+        VK.api('getUserSettings', function(data) {
+            if (data.error) return puts_error(data.error);
+            if (data.response & $rights)
+                func();
+            else {
+                $intention = func;
+                VK.callMethod('showSettingsBox', $rights);
+            }
+        });
+        return false;
+    }
+    VK.addCallback('onSettingsChanged', function(data) {
+        if (data & $rights && $intention) {
+            window[$intention]();
+            $intention = null;
+        }
+    });
+</script>
+</body>
+</html>
