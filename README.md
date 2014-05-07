@@ -7,10 +7,10 @@
 1. Потрібно встановити браузер _Firefox_, а також розширення _DownThemAll_ для нього
 2. Зайти через Firefox на свою VK-сторінку і залогуватись
 3. Зайти на сторінку додатку https://vk.com/app4348249_2617698 і натиснути кнопку _«Отримати посилання на фото»_, почекати деякий час поки генеруються посилання на фото нижче
-![alt tag](http://www.evernote.com/shard/s169/sh/37bb3c07-e236-4fd6-9205-e20b83251e43/ecea389700e0e51023b43bc6d39b13b9)
+![](https://raw.githubusercontent.com/Lukom/vk_photo_links/master/vkpl_goto_app.jpg)
 4. Клікнути правою кнопкою в межах додатку і вибрати _«DownThemAll!...»_
-![alt](http://www.evernote.com/shard/s169/sh/e6bf9a62-62fe-4d34-a918-0cafe42ef816/c58098cb4c49b1788cb948d0e8f21a29)
+![](https://github.com/Lukom/vk_photo_links/raw/master/vkpl_downthemall.png)
 5. У вікні завантажень перейти на вкладку _«Links»_, вибрати куди зберігати фото, вказати маску перейменовування *\*text\*\\*name\*.\*ext\** і натиснути _«Start!»_
-![alt qwe](http://www.evernote.com/shard/s169/sh/e6bf9a62-62fe-4d34-a918-0cafe42ef816/c58098cb4c49b1788cb948d0e8f21a29)
+![](https://github.com/Lukom/vk_photo_links/raw/master/vkpl_save_settings.png)
 6. Готово! Залишилось почекати доки скачаються всі файли.
-![](http://www.evernote.com/shard/s169/sh/9a0a5cc7-b503-4eea-812b-4d67ccbc1f8d/9e0c1e0b39b5b2d6af44af29a6334e75)
+![](https://github.com/Lukom/vk_photo_links/raw/master/vkpl_downloading.png)
